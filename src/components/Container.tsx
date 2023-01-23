@@ -11,7 +11,9 @@ export const Container = ({ title, children }: ContainerProps) => {
     return (
         <View style={styles.container}>
             <Header title={title} />
-            {children}
+            <View style={styles.body}>
+                {children}
+            </View>
         </View>
     )
 }
@@ -21,5 +23,10 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'black',
         padding: 10
+    },
+    body: {
+        flex: 1,
+        justifyContent:'center',
+        alignItems: 'center'
     }
 });

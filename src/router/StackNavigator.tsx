@@ -8,6 +8,7 @@ const Stack = createStackNavigator();
 export const StackNavigator = () => {
     return (
         <Stack.Navigator
+            initialRouteName='PermissionsScreen' // Defaul page on load app
             screenOptions={{
                 headerShown: false,
             }}
