@@ -1,10 +1,11 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+// import { Text, View } from 'react-native';
+import { Container } from '../components/Container';
 
 export const PermissionsScreen = () => {
-  return (
-    <View>
-        <Text>Permissions</Text>
-    </View>
-  )
+    return (
+        <Container title="Permissions">
+
+        </Container>
+    )
 }
