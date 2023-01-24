@@ -4,37 +4,28 @@ import React, { useEffect } from 'react';
 import { Container } from '../components/Container';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { View, StyleSheet } from 'react-native';
-
-
-import Geolocation from '@react-native-community/geolocation';
-
+import { useLocation } from '../hooks/useLocation';
+import { LoadingScreen } from './LoadingScreen';
 
 
 export const HomeScreen = () => {
 
-    useEffect(() => {
+    const { hasPosition, initialPosition } = useLocation();
 
-        Geolocation.getCurrentPosition(
-            info => console.log(info), 
-            (error => console.log(error)),
-            {
-                
-            }
-        );
-
-    }, [])
-
+    if(!hasPosition) {
+        <LoadingScreen />
+    }
 
     return (
         <Container title="Home">
             <View style={styles.container}>
                 <MapView
                     provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-                    style={styles.map}
+                    style={{...styles.map, display: hasPosition ? 'flex' : 'none'}}
                     showsUserLocation={true}
                     region={{
-                        latitude: 37.78825,
-                        longitude: -122.4324,
+                        latitude: initialPosition.latitude,
+                        longitude: initialPosition.longitude,
                         latitudeDelta: 0.015,
                         longitudeDelta: 0.0121,
                     }}
