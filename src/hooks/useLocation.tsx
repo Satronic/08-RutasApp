@@ -14,25 +14,54 @@ export const useLocation = () => {
 
     useEffect(() => {
 
-        Geolocation.getCurrentPosition(
-            (info => {
-                setInitialPosition({
-                    latitude: info.coords.latitude,
-                    longitude: info.coords.longitude
-                });
+        // Promise *****
 
+        getCurrentLocation()
+            .then(position => {
+                setInitialPosition(position);
                 setHasPosition(true);
-            }),
-            (error => console.log(error)),
-            {
-                enableHighAccuracy: true // Obtiene las corrdenadas del GPS
-            }
-        );
+            })
+            .catch(error => console.log(error))
 
-    }, [])
+        // Callback *****
+
+        // Geolocation.getCurrentPosition(
+        //     (info => {
+        //         setInitialPosition({
+        //             latitude: info.coords.latitude,
+        //             longitude: info.coords.longitude
+        //         });
+
+        //         setHasPosition(true);
+        //     }),
+        //     (error => console.log(error)),
+        //     {
+        //         enableHighAccuracy: true // Obtiene las corrdenadas del GPS
+        //     }
+        // );
+
+    }, []);
+
+    const getCurrentLocation = (): Promise<Position> => {
+        return new Promise((resolve, reject) => {
+            Geolocation.getCurrentPosition(
+                ({ coords }) => {
+                    resolve({
+                        latitude: coords.latitude,
+                        longitude: coords.longitude
+                    });
+                },
+                (error) => reject({ error }),
+                {
+                    enableHighAccuracy: true // Obtiene las corrdenadas del GPS
+                }
+            );
+        })
+    }
 
     return {
         hasPosition,
-        initialPosition
+        initialPosition,
+        getCurrentLocation
     }
 }
