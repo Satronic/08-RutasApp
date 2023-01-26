@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Geolocation from '@react-native-community/geolocation';
 import { useState } from 'react';
 import { Position } from '../interfaces/appInterfaces';
@@ -12,13 +12,24 @@ export const useLocation = () => {
         longitude: 0
     });
 
+    const [userPosition, setUserPosition] = useState<Position>({
+        latitude: 0,
+        longitude: 0
+    });
+
+    const [routePoints, setRoutePoints] = useState<Position[]>([])
+
+    const watchId = useRef<number>();
+
     useEffect(() => {
 
         // Promise *****
 
-        getCurrentLocation()
+        getUserPosition()
             .then(position => {
                 setInitialPosition(position);
+                setUserPosition(position);
+                setRoutePoints(points => [...points, position]);
                 setHasPosition(true);
             })
             .catch(error => console.log(error))
@@ -42,7 +53,7 @@ export const useLocation = () => {
 
     }, []);
 
-    const getCurrentLocation = (): Promise<Position> => {
+    const getUserPosition = (): Promise<Position> => {
         return new Promise((resolve, reject) => {
             Geolocation.getCurrentPosition(
                 ({ coords }) => {
@@ -57,11 +68,42 @@ export const useLocation = () => {
                 }
             );
         })
-    }
+    };
+
+    const followUserPosition = () => {
+        watchId.current = Geolocation.watchPosition(
+            ({coords}) => {
+                setUserPosition({
+                    latitude: coords.latitude,
+                    longitude: coords.longitude
+                });
+                setRoutePoints(points => [...points, {
+                    latitude: coords.latitude,
+                    longitude: coords.longitude
+                }])
+            },
+            (error => console.log(error)),
+            {
+                enableHighAccuracy: true, // Obtiene las corrdenadas del GPS
+                distanceFilter: 5 // Intervalo donde toma muestras de la posicion
+            }
+        );
+    };
+
+
+    const stopFollowUserPosition = () => {
+        if(watchId.current) {
+            Geolocation.clearWatch(watchId.current)
+        }
+    };
 
     return {
         hasPosition,
         initialPosition,
-        getCurrentLocation
+        userPosition,
+        routePoints,
+        getUserPosition,
+        followUserPosition,
+        stopFollowUserPosition
     }
 }
